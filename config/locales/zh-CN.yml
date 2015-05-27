@@ -1,0 +1,5 @@
+zh-CN:
+  spree:
+    alipay_pro:
+      invalid_name: "无效的名称"
+      invalid_address: "无效的地址"

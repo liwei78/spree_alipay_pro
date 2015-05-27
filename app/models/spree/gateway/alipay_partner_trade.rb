@@ -18,7 +18,7 @@ module Spree
     end
 
     def method_type
-      'alipay_dual_pay'
+      'alipay_partner_trade'
     end
 
     def provider_class
@@ -48,7 +48,6 @@ module Spree
     def setup_alipay
       Alipay.pid = preferred_pid
       Alipay.key = preferred_key
-      Alipay.seller_email = preferred_seller_email
     end
   end
 end

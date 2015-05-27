@@ -43,8 +43,8 @@ module Spree
 
     def options
       {
-        :out_trade_no      => @payment.identifier,
-        :subject           => %{订单编号: #{@payment.identifier}},
+        :out_trade_no      => @payment.number,
+        :subject           => %{订单编号: #{@payment.number}},
         :logistics_type    => 'EMS',
         :logistics_fee     => @order.shipments.to_a.sum(&:cost),
         :logistics_payment => 'BUYER_PAY',
@@ -55,19 +55,20 @@ module Spree
         :notify_url        => alipay_notify_url,
         :receive_name      => receive_name(@order),
         :receive_address   => receive_address(@order),
-        :receive_zip       => (@order.billing_address.zipcode.presence || "10000" rescue "10000") ,
-        :receive_phone     => (@order.billing_address.phone rescue "11112222333"),
+        :receive_zip       => @order.shipoing_address.zipcode,
+        :receive_phone     => @order.shipoing_address.phone,
+        :seller_email      => @payment_method.preferred_seller_email
       }
     end
 
     def receive_name(order)
-      [order.billing_address.lastname, order.billing_address.firstname].join(" ")
+      [order.shipoing_address.lastname, order.shipoing_address.firstname].join(" ")
     ensure
       Spree.t("alipay_pro.invalid_name")
     end
 
     def receive_address(order)
-      [order.billing_address.country, order.billing_address.state, order.billing_address.city, order.billing_address.address1, order.billing_address.address2].join(" ")
+      [order.shipoing_address.country, order.shipoing_address.state, order.shipoing_address.city, order.shipoing_address.address1, order.shipoing_address.address2].join(" ")
     ensure
       Spree.t("alipay_pro.invalid_address")
     end

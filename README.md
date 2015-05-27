@@ -35,3 +35,5 @@ require 'spree_alipay_pro/factories'
 ```
 
 Copyright (c) 2015 [name of extension creator], released under the New BSD License
+
+

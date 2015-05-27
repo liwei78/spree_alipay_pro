@@ -16,7 +16,7 @@ module Spree
 
     def payment_method_alipay_valid?
       payment_method = Spree::PaymentMethod.find(params[:order][:payments_attributes].first[:payment_method_id])
-      return false unless (payment_method and payment_method.type == "Spree::Gateway::AlipayDualPay")
+      return false unless (payment_method and payment_method.type == "Spree::Gateway::AlipayPartnerTrade")
       return true
     end
   end

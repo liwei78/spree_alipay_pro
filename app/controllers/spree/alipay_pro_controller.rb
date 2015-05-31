@@ -57,6 +57,7 @@ module Spree
         :receive_address   => receive_address(@order),
         :receive_zip       => (@order.billing_address.zipcode.presence || "10000" rescue "10000") ,
         :receive_phone     => (@order.billing_address.phone rescue "11112222333"),
+        :qr_pay_mode       => 2
       }
     end
 

@@ -16,10 +16,11 @@ module Spree
       end
     end
 
-    # 实时到账交易成功，返回 TRADE_FINISHED
+    # 实时到账交易成功，返回 TRADE_SUCCESS
     def notify
       notify_params = params.except(*request.path_parameters.keys)
-      if Alipay::Notify.verify?(notify_params) and notify_params[:trade_status] == 'TRADE_FINISHED'
+      logger.info notify_params
+      if Alipay::Notify.verify?(notify_params) and notify_params[:trade_status] == 'TRADE_SUCCESS'
         out_trade_no = notify_params[:out_trade_no]
         payment = Spree::Payment.find_by(identifier: out_trade_no) || raise(ActiveRecord::RecordNotFound)
         payment.complete!

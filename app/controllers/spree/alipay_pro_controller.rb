@@ -22,7 +22,7 @@ module Spree
       logger.info notify_params
       if Alipay::Notify.verify?(notify_params) and notify_params[:trade_status] == 'TRADE_SUCCESS'
         out_trade_no = notify_params[:out_trade_no]
-        payment = Spree::Payment.find_by(identifier: out_trade_no) || raise(ActiveRecord::RecordNotFound)
+        payment = Spree::Payment.find_by(number: out_trade_no) || raise(ActiveRecord::RecordNotFound)
         payment.complete!
         payment.order.update_attributes(state: "complete")
         payment.order.finalize!

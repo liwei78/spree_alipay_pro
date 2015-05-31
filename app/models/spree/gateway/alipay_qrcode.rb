@@ -1,6 +1,9 @@
 require 'alipay'
+require 'alipay_pro/qrcode'
+
 module Spree
-  class Gateway::AlipayPartnerTrade < Gateway
+  class Gateway::AlipayQrcode < Gateway
+
     preference :pid, :string
     preference :key, :string
 
@@ -17,29 +20,24 @@ module Spree
     end
 
     def method_type
-      'alipay_partner_trade'
+      'alipay_qrcode'
     end
 
     def provider_class
-      ::Alipay::Service
+      ::AlipayPro::Qrcode
     end
 
     def provider
       setup_alipay
-      ::Alipay::Service
+      ::AlipayPro::Qrcode
     end
 
     def purchase(money, source, gateway_options)
       nil
     end
 
-    # 购买
-    def pay(options={})
-      provider.create_partner_trade_by_buyer_url(options)
-    end
-    # 退款
-    def refund
-
+    def manage_qrcode(method, options={})
+      provider.manage_qrcode(method, options)
     end
 
     private

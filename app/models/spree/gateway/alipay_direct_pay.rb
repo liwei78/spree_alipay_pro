@@ -1,6 +1,6 @@
 require 'alipay'
 module Spree
-  class Gateway::AlipayPartnerTrade < Gateway
+  class Gateway::AlipayDirectPay < Gateway
     preference :pid, :string
     preference :key, :string
 
@@ -17,7 +17,7 @@ module Spree
     end
 
     def method_type
-      'alipay_partner_trade'
+      'alipay_direct_pay'
     end
 
     def provider_class
@@ -35,8 +35,9 @@ module Spree
 
     # 购买
     def pay(options={})
-      provider.create_partner_trade_by_buyer_url(options)
+      provider.create_direct_pay_by_user_url(options)
     end
+
     # 退款
     def refund
 

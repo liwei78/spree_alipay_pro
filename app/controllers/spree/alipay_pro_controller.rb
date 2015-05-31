@@ -3,22 +3,23 @@ module Spree
     skip_before_filter :verify_authenticity_token, only: [:notify]
     # ssl_allowed
 
-    # 标准双接口
+    # 实时到账接口
     def pay
       @order = current_order || raise(ActiveRecord::RecordNotFound)
       @payment = @order.payments.create(amount: @order.amount, payment_method_id: params[:payment_method_id])
       if @payment
         @payment.started_processing!
-        pay_url = payment_method.pay options
+        pay_url = payment_method.pay(options)
         redirect_to pay_url
       else
         redirect_to :root, notice: Spree.t(:no_payment_found)
       end
     end
 
+    # 实时到账交易成功，返回 TRADE_FINISHED
     def notify
       notify_params = params.except(*request.path_parameters.keys)
-      if Alipay::Notify.verify?(notify_params) and notify_params[:trade_status] == 'WAIT_SELLER_SEND_GOODS'
+      if Alipay::Notify.verify?(notify_params) and notify_params[:trade_status] == 'TRADE_FINISHED'
         out_trade_no = notify_params[:out_trade_no]
         payment = Spree::Payment.find_by(identifier: out_trade_no) || raise(ActiveRecord::RecordNotFound)
         payment.complete!
@@ -28,6 +29,27 @@ module Spree
       else
         render text: "fail"
       end
+    end
+
+    # 添加二维码
+    def add_qrcode
+      @order = current_order || raise(ActiveRecord::RecordNotFound)
+      url = payment_method.manage_qrcode("add", options2)
+      redirect_to url
+    end
+
+    # params with qrcode url
+    def show_qrcode
+
+    end
+
+    def query_product
+
+    end
+
+    # 获取商品信息
+    def query
+
     end
 
     private
@@ -55,20 +77,30 @@ module Spree
         :notify_url        => alipay_notify_url,
         :receive_name      => receive_name(@order),
         :receive_address   => receive_address(@order),
-        :receive_zip       => @order.shipoing_address.zipcode,
-        :receive_phone     => @order.shipoing_address.phone,
-        :seller_email      => @payment_method.preferred_seller_email
+        :receive_zip       => @order.shipping_address.zipcode,
+        :receive_phone     => @order.shipping_address.phone,
+        :qr_pay_mode       => 2
+      }
+    end
+
+    def options2
+      {
+        payment_method: @payment_method,
+        order: @order,
+        return_uri: alipay_show_qrcode_url,
+        notify_uri: alipay_notify_url,
+        query_url: alipay_query_product_url,
       }
     end
 
     def receive_name(order)
-      [order.shipoing_address.lastname, order.shipoing_address.firstname].join(" ")
+      [order.shipping_address.lastname, order.shipping_address.firstname].join(" ")
     ensure
       Spree.t("alipay_pro.invalid_name")
     end
 
     def receive_address(order)
-      [order.shipoing_address.country, order.shipoing_address.state, order.shipoing_address.city, order.shipoing_address.address1, order.shipoing_address.address2].join(" ")
+      [order.shipping_address.country, order.shipping_address.state, order.shipping_address.city, order.shipping_address.address1, order.shipping_address.address2].join(" ")
     ensure
       Spree.t("alipay_pro.invalid_address")
     end

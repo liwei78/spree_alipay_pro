@@ -18,7 +18,9 @@ module SpreeAlipay
     config.to_prepare &method(:activate).to_proc
 
     initializer "spree.spree_alipay_pro.payment_methods", after: "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << Spree::Gateway::AlipayDirectPay
       app.config.spree.payment_methods << Spree::Gateway::AlipayPartnerTrade
+      app.config.spree.payment_methods << Spree::Gateway::AlipayQrcode
     end
   end
 end

@@ -20,12 +20,14 @@ module Spree
     def notify
       notify_params = params.except(*request.path_parameters.keys)
       logger.info notify_params
-      if Alipay::Notify.verify?(notify_params) and notify_params[:trade_status] == 'TRADE_SUCCESS'
+      if Alipay::Notify.verify?(notify_params) and ['TRADE_FINISHED', 'TRADE_SUCCESS'].include?(notify_params[:trade_status])
         out_trade_no = notify_params[:out_trade_no]
         payment = Spree::Payment.find_by(number: out_trade_no) || raise(ActiveRecord::RecordNotFound)
-        payment.complete!
-        payment.order.update_attributes(state: "complete")
-        payment.order.finalize!
+        unless payment.completed?
+          payment.complete!
+          payment.order.update_attributes(state: "complete")
+          payment.order.finalize!
+        end
         render text: "success"
       else
         render text: "fail"

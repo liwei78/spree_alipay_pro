@@ -81,10 +81,12 @@ module Spree
         :receive_name      => receive_name(@order),
         :receive_address   => receive_address(@order),
         :receive_zip       => @order.shipping_address.zipcode,
-        :receive_phone     => @order.shipping_address.phone,
-        :qr_pay_mode       => 2
+        :receive_phone     => @order.shipping_address.phone
       }
     end
+    # Removed
+    # :qr_pay_mode       => 2,
+    # :enable_paymethod  => "directPay^bankPay^cartoon^cash^creditCardExpress^debitCardExpress^coupon^point"
 
     def options2
       {
